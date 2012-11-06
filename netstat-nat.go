@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/dominikh/simple-router/conntrack"
 	"github.com/dominikh/simple-router/lookup"
-	"github.com/dominikh/simple-router/nat"
 
 	"flag"
 	"fmt"
@@ -30,22 +29,22 @@ var noHeader = flag.Bool("o", false, "Strip output header")
 func main() {
 	flag.Parse()
 
-	var which nat.Flag
+	var which conntrack.FilterFlag
 
 	if *onlySNAT {
-		which = nat.SNAT
+		which = conntrack.SNATFilter
 	}
 
 	if *onlyDNAT {
-		which = nat.DNAT
+		which = conntrack.DNATFilter
 	}
 
 	if *onlyLocal {
-		which = nat.Local
+		which = conntrack.LocalFilter
 	}
 
 	if *onlyRouted {
-		which = nat.Routed
+		which = conntrack.RoutedFilter
 	}
 
 	flows, err := conntrack.Flows()
@@ -60,7 +59,7 @@ func main() {
 		fmt.Fprintln(tabWriter, "Proto\tSource Address\tDestination Address\tState")
 	}
 
-	natFlows := nat.GetNAT(flows, which)
+	natFlows := conntrack.Filter(flows, which)
 	for _, flow := range natFlows {
 		sHostname := lookup.Resolve(flow.Original.Source, *noResolve)
 		dHostname := lookup.Resolve(flow.Original.Destination, *noResolve)
