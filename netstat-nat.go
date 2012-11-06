@@ -16,7 +16,8 @@ import (
 //       -x: extended hostnames view
 //       -r src | dst | src-port | dst-port | state : sort connections
 //       -N: display NAT box connection information (only valid with SNAT & DNAT)
-//       -v: print version
+
+var Version = "0.1.0"
 
 var onlySNAT = flag.BoolP("snat", "S", false, "Display only SNAT connections")
 var onlyDNAT = flag.BoolP("dnat", "D", false, "Display only DNAT connections")
@@ -27,9 +28,15 @@ var noHeader = flag.BoolP("no-header", "o", false, "Strip output header")
 var protocol = flag.StringP("protocol", "p", "", "Filter connections by protocol")
 var sourceHost = flag.StringP("source", "s", "", "Filter by source IP")
 var destinationHost = flag.StringP("destination", "d", "", "Filter by destination IP")
+var displayVersion = flag.BoolP("version", "v", false, "Print version")
 
 func main() {
 	flag.Parse()
+
+	if *displayVersion {
+		fmt.Println("Version " + Version)
+		os.Exit(0)
+	}
 
 	which := conntrack.SNATFilter | conntrack.DNATFilter
 
