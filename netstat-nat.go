@@ -11,7 +11,6 @@ import (
 )
 
 // TODO implement the following flags
-//       -p <protocol>        : display connections by protocol
 //       -s <source-host>     : display connections by source
 //       -d <destination-host>: display connections by destination
 //       -x: extended hostnames view
@@ -25,6 +24,7 @@ var onlyLocal = flag.Bool("L", false, "Display only local connections (originati
 var onlyRouted = flag.Bool("R", false, "Display only connections routed through the router")
 var noResolve = flag.Bool("n", false, "Do not resolve hostnames") // TODO resolve port names as well
 var noHeader = flag.Bool("o", false, "Strip output header")
+var protocol = flag.String("p", "", "Filter connections by protocol")
 
 func main() {
 	flag.Parse()
@@ -60,6 +60,9 @@ func main() {
 	}
 
 	filteredFlows := flows.FilterByType(which)
+	if *protocol != "" {
+		filteredFlows = filteredFlows.FilterByProtocol(*protocol)
+	}
 
 	for _, flow := range filteredFlows {
 		sHostname := lookup.Resolve(flow.Original.Source, *noResolve)
