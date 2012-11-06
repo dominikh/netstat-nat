@@ -29,7 +29,7 @@ var noHeader = flag.Bool("o", false, "Strip output header")
 func main() {
 	flag.Parse()
 
-	var which conntrack.FilterFlag
+	which := conntrack.SNATFilter | conntrack.DNATFilter
 
 	if *onlySNAT {
 		which = conntrack.SNATFilter
