@@ -6,13 +6,12 @@ import (
 
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"text/tabwriter"
 )
 
 // TODO implement the following flags
-//       -s <source-host>     : display connections by source
-//       -d <destination-host>: display connections by destination
 //       -x: extended hostnames view
 //       -r src | dst | src-port | dst-port | state : sort connections
 //       -N: display NAT box connection information (only valid with SNAT & DNAT)
@@ -25,6 +24,8 @@ var onlyRouted = flag.Bool("R", false, "Display only connections routed through 
 var noResolve = flag.Bool("n", false, "Do not resolve hostnames") // TODO resolve port names as well
 var noHeader = flag.Bool("o", false, "Strip output header")
 var protocol = flag.String("p", "", "Filter connections by protocol")
+var sourceHost = flag.String("s", "", "Filter by source IP")
+var destinationHost = flag.String("d", "", "Filter by destination IP")
 
 func main() {
 	flag.Parse()
@@ -62,6 +63,20 @@ func main() {
 	filteredFlows := flows.FilterByType(which)
 	if *protocol != "" {
 		filteredFlows = filteredFlows.FilterByProtocol(*protocol)
+	}
+
+	if *sourceHost != "" {
+		sourceIP := net.ParseIP(*sourceHost) // TODO support hostnames
+		filteredFlows = filteredFlows.Filter(func(flow conntrack.Flow) bool {
+			return flow.Original.Source.Equal(sourceIP)
+		})
+	}
+
+	if *destinationHost != "" {
+		destinationIP := net.ParseIP(*destinationHost) // TODO support hostnames
+		filteredFlows = filteredFlows.Filter(func(flow conntrack.Flow) bool {
+			return flow.Original.Destination.Equal(destinationIP)
+		})
 	}
 
 	for _, flow := range filteredFlows {
