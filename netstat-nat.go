@@ -59,7 +59,7 @@ func main() {
 		fmt.Fprintln(tabWriter, "Proto\tSource Address\tDestination Address\tState")
 	}
 
-	natFlows := conntrack.Filter(flows, which)
+	natFlows := flows.Filter(which)
 	for _, flow := range natFlows {
 		sHostname := lookup.Resolve(flow.Original.Source, *noResolve)
 		dHostname := lookup.Resolve(flow.Original.Destination, *noResolve)
