@@ -9,13 +9,49 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sort"
 	"strconv"
 	"text/tabwriter"
 )
 
 // TODO implement the following flags
-//       -r src | dst | src-port | dst-port | state : sort connections
 //       -N: display NAT box connection information (only valid with SNAT & DNAT)
+
+type FlowSlice conntrack.FlowSlice
+
+type SortBySource struct{ FlowSlice }
+type SortByDestination struct{ FlowSlice }
+type SortBySPort struct{ FlowSlice }
+type SortByDPort struct{ FlowSlice }
+type SortByState struct{ FlowSlice }
+
+func (flows FlowSlice) Swap(i, j int) {
+	flows[i], flows[j] = flows[j], flows[i]
+}
+
+func (flows FlowSlice) Len() int {
+	return len(flows)
+}
+
+func (flows SortBySource) Less(i, j int) bool {
+	return flows.FlowSlice[i].Original.Source.String() < flows.FlowSlice[j].Original.Source.String()
+}
+
+func (flows SortByDestination) Less(i, j int) bool {
+	return flows.FlowSlice[i].Original.Destination.String() < flows.FlowSlice[j].Original.Destination.String()
+}
+
+func (flows SortBySPort) Less(i, j int) bool {
+	return flows.FlowSlice[i].Original.SPort < flows.FlowSlice[j].Original.SPort
+}
+
+func (flows SortByDPort) Less(i, j int) bool {
+	return flows.FlowSlice[i].Original.DPort < flows.FlowSlice[j].Original.DPort
+}
+
+func (flows SortByState) Less(i, j int) bool {
+	return flows.FlowSlice[i].State < flows.FlowSlice[j].State
+}
 
 var Version = "0.1.0"
 
@@ -29,6 +65,7 @@ var protocol = flag.StringP("protocol", "p", "", "Filter connections by protocol
 var sourceHost = flag.StringP("source", "s", "", "Filter by source IP")
 var destinationHost = flag.StringP("destination", "d", "", "Filter by destination IP")
 var displayVersion = flag.BoolP("version", "v", false, "Print version")
+var sortBy = flag.StringP("sort", "r", "src", "Sort connections (src | dst | src-port | dst-port | state)")
 
 func main() {
 	flag.Parse()
@@ -90,6 +127,19 @@ func main() {
 		filteredFlows = filteredFlows.Filter(func(flow conntrack.Flow) bool {
 			return flow.Original.Destination.Equal(destinationIP)
 		})
+	}
+
+	switch *sortBy {
+	case "src":
+		sort.Sort(SortBySource{FlowSlice(filteredFlows)})
+	case "dst":
+		sort.Sort(SortByDestination{FlowSlice(filteredFlows)})
+	case "src-port":
+		sort.Sort(SortBySPort{FlowSlice(filteredFlows)})
+	case "dst-port":
+		sort.Sort(SortByDPort{FlowSlice(filteredFlows)})
+	case "state":
+		sort.Sort(SortByState{FlowSlice(filteredFlows)})
 	}
 
 	for _, flow := range filteredFlows {
