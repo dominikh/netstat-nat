@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/dominikh/simple-router/conntrack"
 	"github.com/dominikh/simple-router/lookup"
+	"github.com/dominikh/simple-router/netdb"
 
 	flag "github.com/ogier/pflag"
 
@@ -70,7 +71,12 @@ func main() {
 
 	filteredFlows := flows.FilterByType(which)
 	if *protocol != "" {
-		filteredFlows = filteredFlows.FilterByProtocol(*protocol)
+		protoent, err := netdb.GetProtoByName(*protocol)
+		if err != nil {
+			// TODO descriptive error message
+			panic(err)
+		}
+		filteredFlows = filteredFlows.FilterByProtocol(protoent)
 	}
 
 	if *sourceHost != "" {
@@ -92,7 +98,7 @@ func main() {
 		dHostname := lookup.Resolve(flow.Original.Destination, *noResolve)
 
 		fmt.Fprintf(tabWriter, "%s\t%s:%d\t%s:%d\t%s\n",
-			flow.Protocol,
+			flow.Protocol.Name,
 			sHostname,
 			flow.Original.SPort,
 			dHostname,
