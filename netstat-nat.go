@@ -66,6 +66,7 @@ var sourceHost = flag.StringP("source", "s", "", "Filter by source IP")
 var destinationHost = flag.StringP("destination", "d", "", "Filter by destination IP")
 var displayVersion = flag.BoolP("version", "v", false, "Print version")
 var sortBy = flag.StringP("sort", "r", "src", "Sort connections (src | dst | src-port | dst-port | state)")
+var _ = flag.BoolP("extended-hostnames", "x", false, "This flag serves no purpose other than compatibility")
 
 func main() {
 	flag.Parse()
