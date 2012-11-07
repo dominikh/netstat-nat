@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/dominikh/simple-router/conntrack"
 	"github.com/dominikh/simple-router/lookup"
-	"github.com/dominikh/simple-router/netdb"
+	"github.com/dominikh/netdb"
 
 	flag "github.com/ogier/pflag"
 
