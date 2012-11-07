@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"text/tabwriter"
 )
 
@@ -96,15 +97,25 @@ func main() {
 	for _, flow := range filteredFlows {
 		sHostname := lookup.Resolve(flow.Original.Source, *noResolve)
 		dHostname := lookup.Resolve(flow.Original.Destination, *noResolve)
-
-		fmt.Fprintf(tabWriter, "%s\t%s:%d\t%s:%d\t%s\n",
+		sPortName := portToName(int(flow.Original.SPort), flow.Protocol.Name)
+		dPortName := portToName(int(flow.Original.DPort), flow.Protocol.Name)
+		fmt.Fprintf(tabWriter, "%s\t%s:%s\t%s:%s\t%s\n",
 			flow.Protocol.Name,
 			sHostname,
-			flow.Original.SPort,
+			sPortName,
 			dHostname,
-			flow.Original.DPort,
+			dPortName,
 			flow.State,
 		)
 	}
 	tabWriter.Flush()
+}
+
+func portToName(port int, protocol string) string {
+	servent, ok := netdb.GetServByPort(port, protocol)
+	if !ok {
+		return strconv.FormatInt(int64(port), 10)
+	}
+
+	return servent.Name
 }
