@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/dominikh/simple-router/lookup"
-
 	"github.com/dominikh/conntrack"
 	"github.com/dominikh/netdb"
 
@@ -96,8 +94,8 @@ func main() {
 	}
 
 	for _, flow := range filteredFlows {
-		sHostname := lookup.Resolve(flow.Original.Source, *noResolve)
-		dHostname := lookup.Resolve(flow.Original.Destination, *noResolve)
+		sHostname := resolve(flow.Original.Source, *noResolve)
+		dHostname := resolve(flow.Original.Destination, *noResolve)
 		sPortName := portToName(int(flow.Original.SPort), flow.Protocol.Name)
 		dPortName := portToName(int(flow.Original.DPort), flow.Protocol.Name)
 		fmt.Fprintf(tabWriter, "%s\t%s:%s\t%s:%s\t%s\n",
@@ -119,4 +117,17 @@ func portToName(port int, protocol string) string {
 	}
 
 	return servent.Name
+}
+
+func resolve(ip net.IP, noop bool) string {
+	if noop {
+		return ip.String()
+	}
+
+	lookup, err := net.LookupAddr(ip.String())
+	if err == nil && len(lookup) > 0 {
+		return lookup[0]
+	}
+
+	return ip.String()
 }
