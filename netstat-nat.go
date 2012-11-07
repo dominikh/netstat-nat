@@ -95,22 +95,16 @@ func main() {
 
 	flows, err := conntrack.Flows()
 	if err != nil {
-		panic(err)
-	}
-
-	tabWriter := &tabwriter.Writer{}
-	tabWriter.Init(os.Stdout, 0, 0, 4, ' ', 0)
-
-	if !*noHeader {
-		fmt.Fprintln(tabWriter, "Proto\tSource Address\tDestination Address\tState")
+		fmt.Fprintf(os.Stderr, "Could not read conntrack information: %s\n", err.Error())
+		os.Exit(1)
 	}
 
 	filteredFlows := flows.FilterByType(which)
 	if *protocol != "" {
 		protoent, ok := netdb.GetProtoByName(*protocol)
 		if !ok {
-			// TODO descriptive error message
-			panic("Unknown protocol")
+			fmt.Fprintf(os.Stderr, "'%s' is not a known protocol.\n", *protocol)
+			os.Exit(1)
 		}
 		filteredFlows = filteredFlows.FilterByProtocol(protoent)
 	}
@@ -140,6 +134,13 @@ func main() {
 		sort.Sort(SortByDPort{FlowSlice(filteredFlows)})
 	case "state":
 		sort.Sort(SortByState{FlowSlice(filteredFlows)})
+	}
+
+	tabWriter := &tabwriter.Writer{}
+	tabWriter.Init(os.Stdout, 0, 0, 4, ' ', 0)
+
+	if !*noHeader {
+		fmt.Fprintln(tabWriter, "Proto\tSource Address\tDestination Address\tState")
 	}
 
 	for _, flow := range filteredFlows {
