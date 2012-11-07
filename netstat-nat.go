@@ -71,10 +71,10 @@ func main() {
 
 	filteredFlows := flows.FilterByType(which)
 	if *protocol != "" {
-		protoent, err := netdb.GetProtoByName(*protocol)
-		if err != nil {
+		protoent, ok := netdb.GetProtoByName(*protocol)
+		if !ok {
 			// TODO descriptive error message
-			panic(err)
+			panic("Unknown protocol")
 		}
 		filteredFlows = filteredFlows.FilterByProtocol(protoent)
 	}
