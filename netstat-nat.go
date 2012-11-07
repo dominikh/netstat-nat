@@ -14,7 +14,6 @@ import (
 )
 
 // TODO implement the following flags
-//       -x: extended hostnames view
 //       -r src | dst | src-port | dst-port | state : sort connections
 //       -N: display NAT box connection information (only valid with SNAT & DNAT)
 
@@ -24,7 +23,7 @@ var onlySNAT = flag.BoolP("snat", "S", false, "Display only SNAT connections")
 var onlyDNAT = flag.BoolP("dnat", "D", false, "Display only DNAT connections")
 var onlyLocal = flag.BoolP("local", "L", false, "Display only local connections (originating from or going to the router)")
 var onlyRouted = flag.BoolP("routed", "R", false, "Display only connections routed through the router")
-var noResolve = flag.BoolP("no-resolve", "n", false, "Do not resolve hostnames") // TODO resolve port names as well
+var noResolve = flag.BoolP("no-resolve", "n", false, "Do not resolve hostnames")
 var noHeader = flag.BoolP("no-header", "o", false, "Strip output header")
 var protocol = flag.StringP("protocol", "p", "", "Filter connections by protocol")
 var sourceHost = flag.StringP("source", "s", "", "Filter by source IP")
