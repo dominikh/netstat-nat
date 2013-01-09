@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/dominikh/conntrack"
-	"github.com/dominikh/netdb"
+	"honnef.co/go/conntrack"
+	"honnef.co/go/netdb"
 
 	flag "github.com/ogier/pflag"
 

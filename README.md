@@ -1,10 +1,18 @@
-This is a reimplementation of the netstat-nat[1] tool, written
+# netstat-nat
+
+This is a reimplementation of the
+[netstat-nat](http://tweegy.nl/projects/netstat-nat/) tool, written
 entirely in Go. It uses the same command line flags and almost the
 same output format so it can be used as a drop-in replacement in most
 cases.
 
-Differences
------------
+## Install
+
+```sh
+go get -u honnef.co/go/netstat-nat
+```
+
+## Differences
 
 - The original version limits the printed hostnames to fixed width. We
   do not.
@@ -13,8 +21,3 @@ Differences
   hostnames.
 
 - The -N flag is not yet supported.
-
-Links
------
-
-[1]: http://tweegy.nl/projects/netstat-nat/
