@@ -102,8 +102,8 @@ func main() {
 
 	filteredFlows := flows.FilterByType(which)
 	if *protocol != "" {
-		protoent, ok := netdb.GetProtoByName(*protocol)
-		if !ok {
+		protoent := netdb.GetProtoByName(*protocol)
+		if protoent == nil {
 			fmt.Fprintf(os.Stderr, "'%s' is not a known protocol.\n", *protocol)
 			os.Exit(1)
 		}
@@ -147,8 +147,8 @@ func main() {
 	for _, flow := range filteredFlows {
 		sHostname := resolve(flow.Original.Source, *noResolve)
 		dHostname := resolve(flow.Original.Destination, *noResolve)
-		sPortName := portToName(int(flow.Original.SPort), flow.Protocol.Name)
-		dPortName := portToName(int(flow.Original.DPort), flow.Protocol.Name)
+		sPortName := portToName(int(flow.Original.SPort), flow.Protocol)
+		dPortName := portToName(int(flow.Original.DPort), flow.Protocol)
 		fmt.Fprintf(tabWriter, "%s\t%s:%s\t%s:%s\t%s\n",
 			flow.Protocol.Name,
 			sHostname,
@@ -161,9 +161,9 @@ func main() {
 	tabWriter.Flush()
 }
 
-func portToName(port int, protocol string) string {
-	servent, ok := netdb.GetServByPort(port, protocol)
-	if !ok {
+func portToName(port int, protocol *netdb.Protoent) string {
+	servent := netdb.GetServByPort(port, protocol)
+	if servent == nil {
 		return strconv.FormatInt(int64(port), 10)
 	}
 
