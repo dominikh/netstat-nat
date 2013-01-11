@@ -12,6 +12,12 @@ cases.
 go get -u honnef.co/go/netstat-nat
 ```
 
+## Usage
+
+```sh
+$GOPATH/bin/netstat-nat --help
+```
+
 ## Differences
 
 - The original version limits the printed hostnames to fixed width. We
