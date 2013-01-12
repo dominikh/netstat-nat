@@ -147,8 +147,8 @@ func main() {
 	for _, flow := range filteredFlows {
 		sHostname := resolve(flow.Original.Source, *noResolve)
 		dHostname := resolve(flow.Original.Destination, *noResolve)
-		sPortName := portToName(int(flow.Original.SPort), flow.Protocol)
-		dPortName := portToName(int(flow.Original.DPort), flow.Protocol)
+		sPortName := portToName(flow.Original.SPort, flow.Protocol)
+		dPortName := portToName(flow.Original.DPort, flow.Protocol)
 		fmt.Fprintf(tabWriter, "%s\t%s:%s\t%s:%s\t%s\n",
 			flow.Protocol.Name,
 			sHostname,
