@@ -1,4 +1,4 @@
-package main
+package main // import "honnef.co/go/netstat-nat"
 
 import (
 	"honnef.co/go/conntrack"
