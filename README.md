@@ -9,7 +9,7 @@ cases.
 ## Install
 
 ```sh
-go get -u honnef.co/go/netstat-nat
+go get honnef.co/go/netstat-nat
 ```
 
 ## Usage
